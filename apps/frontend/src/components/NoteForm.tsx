@@ -41,7 +41,7 @@ export function NoteForm({ onSubmit }: Props) {
         onChange={(e) => setBody(e.target.value)}
       />
       <button type="submit" disabled={submitting}>
-        {submitting ? "Saving..." : "Add note"}
+        {submitting ? "Saving..." : "Save"}
       </button>
       {error && <p role="alert">{error}</p>}
     </form>

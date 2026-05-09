@@ -45,7 +45,7 @@ describe("App", () => {
 
     await userEvent.type(screen.getByLabelText("title"), "New");
     await userEvent.type(screen.getByLabelText("body"), "Created");
-    await userEvent.click(screen.getByRole("button", { name: /add note/i }));
+    await userEvent.click(screen.getByRole("button", { name: /save/i }));
 
     expect(createNote).toHaveBeenCalledWith({ title: "New", body: "Created" });
     expect(await screen.findByText("New")).toBeInTheDocument();
