@@ -11,6 +11,7 @@ export function App() {
   async function refresh() {
     try {
       setNotes(await listNotes());
+      console.log("debug:", notes);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     }
