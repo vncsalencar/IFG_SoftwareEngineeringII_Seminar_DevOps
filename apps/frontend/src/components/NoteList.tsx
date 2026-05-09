@@ -12,9 +12,7 @@ export function NoteList({ notes, onDelete }: Props) {
   }
   return (
     <ul>
-      {notes.map((note) => (
-        <NoteItem key={note.id} note={note} onDelete={onDelete} />
-      ))}
+      {notes.map((note) => (<NoteItem key={note.id} note={note} onDelete={onDelete} />))}
     </ul>
   );
 }
