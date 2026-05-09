@@ -17,7 +17,6 @@ export function NoteForm({ onSubmit }: Props) {
     setSubmitting(true);
     try {
       await onSubmit({ title, body });
-      setTitle("");
       setBody("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
