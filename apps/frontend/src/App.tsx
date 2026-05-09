@@ -32,9 +32,7 @@ export function App() {
     await refresh();
   }
 
-  const filtered = notes.filter((note) =>
-    note.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = notes.filter((note) => note.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <main>
