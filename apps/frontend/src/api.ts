@@ -21,6 +21,12 @@ export async function createNote(input: CreateNoteInput): Promise<Note> {
   return res.json();
 }
 
+export async function countNotes(): Promise<number> {
+  const res = await fetch(`${BASE_URL}/notes/count`);
+  if (!res.ok) throw new Error(`Failed to count notes: ${res.status}`);
+  return res.json();
+}
+
 export async function deleteNote(id: string): Promise<void> {
   const res = await fetch(`${BASE_URL}/notes/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error(`Failed to delete note: ${res.status}`);
