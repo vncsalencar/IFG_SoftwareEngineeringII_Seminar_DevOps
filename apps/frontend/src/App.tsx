@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { createNote, deleteNote, listNotes } from "./api";
+import { countNotes, createNote, deleteNote, listNotes } from "./api";
 import { NoteForm } from "./components/NoteForm";
 import { NoteList } from "./components/NoteList";
 import type { Note } from "./types";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [noteCount, setNoteCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   async function refresh() {
     try {
-      setNotes(await listNotes());
+      const [nextNotes, nextCount] = await Promise.all([listNotes(), countNotes()]);
+      setNotes(nextNotes);
+      setNoteCount(nextCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     }
@@ -33,6 +36,7 @@ export function App() {
   return (
     <main>
       <h1>Notes</h1>
+      <aside>Total: {noteCount} notes</aside>
       <NoteForm onSubmit={handleCreate} />
       {error && <p role="alert">{error}</p>}
       <NoteList notes={notes} onDelete={handleDelete} />

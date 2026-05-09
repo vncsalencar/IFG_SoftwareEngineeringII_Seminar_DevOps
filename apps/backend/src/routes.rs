@@ -16,6 +16,7 @@ use crate::{
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/notes", get(list_notes).post(create_note))
+        .route("/notes/count", get(count_notes))
         .route(
             "/notes/:id",
             put(update_note).delete(delete_note).get(get_note),
@@ -34,6 +35,13 @@ async fn list_notes(State(state): State<AppState>) -> Result<Json<Vec<Note>>, Ap
     .fetch_all(&state.pool)
     .await?;
     Ok(Json(notes))
+}
+
+async fn count_notes(State(state): State<AppState>) -> Result<Json<i64>, AppError> {
+    let count = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM notes")
+        .fetch_one(&state.pool)
+        .await?;
+    Ok(Json(count))
 }
 
 async fn get_note(
@@ -189,6 +197,40 @@ mod tests {
         let body = json_body(response).await;
         assert_eq!(body["title"], "Hello");
         assert_eq!(body["body"], "World");
+    }
+
+    #[tokio::test]
+    async fn counts_notes() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        for title in ["First", "Second"] {
+            app.clone()
+                .oneshot(
+                    Request::builder()
+                        .method("POST")
+                        .uri("/api/notes")
+                        .header("content-type", "application/json")
+                        .body(Body::from(format!(r#"{{"title":"{title}","body":"x"}}"#)))
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+        }
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/notes/count")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        let body = json_body(response).await;
+        assert_eq!(body, serde_json::json!(2));
     }
 
     #[tokio::test]
