@@ -23,9 +23,7 @@ pub fn router() -> Router<AppState> {
         .route("/health", get(health))
 }
 
-async fn health() -> &'static str {
-    "ok"
-}
+async fn health() -> &'static str {  "ok"  }
 
 async fn list_notes(State(state): State<AppState>) -> Result<Json<Vec<Note>>, AppError> {
     let notes = sqlx::query_as::<_, Note>(
