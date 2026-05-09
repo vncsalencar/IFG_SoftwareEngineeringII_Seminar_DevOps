@@ -10,7 +10,7 @@ describe("NoteForm", () => {
 
     await userEvent.type(screen.getByLabelText("title"), "My title");
     await userEvent.type(screen.getByLabelText("body"), "My body");
-    await userEvent.click(screen.getByRole("button", { name: /add note/i }));
+    await userEvent.click(screen.getByRole("button", { name: /save/i }));
 
     expect(onSubmit).toHaveBeenCalledWith({ title: "My title", body: "My body" });
   });
@@ -20,7 +20,7 @@ describe("NoteForm", () => {
     render(<NoteForm onSubmit={onSubmit} />);
     const titleInput = screen.getByLabelText("title") as HTMLInputElement;
     await userEvent.type(titleInput, "x");
-    await userEvent.click(screen.getByRole("button", { name: /add note/i }));
+    await userEvent.click(screen.getByRole("button", { name: /save/i }));
     expect(titleInput.value).toBe("");
   });
 
@@ -29,7 +29,7 @@ describe("NoteForm", () => {
     render(<NoteForm onSubmit={onSubmit} />);
 
     await userEvent.type(screen.getByLabelText("title"), "x");
-    await userEvent.click(screen.getByRole("button", { name: /add note/i }));
+    await userEvent.click(screen.getByRole("button", { name: /save/i }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("nope");
   });
