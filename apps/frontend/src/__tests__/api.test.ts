@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createNote, listNotes } from "../api";
+import { createNote, deleteNote, listNotes } from "../api";
 
 describe("api", () => {
   beforeEach(() => {
@@ -27,5 +27,15 @@ describe("api", () => {
       json: async () => ({ error: "title cannot be empty" }),
     });
     await expect(createNote({ title: "", body: "x" })).rejects.toThrow("title cannot be empty");
+  });
+
+  it("deleteNote resolves on successful delete", async () => {
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true });
+    await expect(deleteNote("1")).resolves.toBeUndefined();
+  });
+
+  it("deleteNote throws when delete fails", async () => {
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, status: 500 });
+    await expect(deleteNote("1")).rejects.toThrow("Failed to delete note: 500");
   });
 });

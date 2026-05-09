@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NoteItem snapshot > matches snapshot 1`] = `
+<div>
+  <li>
+    <h3>
+      Snap title
+    </h3>
+    <p>
+      Snap body
+    </p>
+    <button
+      aria-label="delete Snap title"
+    >
+      Delete
+    </button>
+  </li>
+</div>
+`;
