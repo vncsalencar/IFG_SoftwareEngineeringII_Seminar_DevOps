@@ -27,7 +27,7 @@ async fn health() -> &'static str {
     "ok"
 }
 
-async fn list_notes(State(state): State<AppState>) -> Result<Json<Vec<Note>>, AppError> {
+async fn list_notes(State(state): State<AppState>) -> Result<Json<String>, AppError> {
     let notes = sqlx::query_as::<_, Note>(
         "SELECT id, title, body, created_at, updated_at FROM notes ORDER BY created_at DESC",
     )
