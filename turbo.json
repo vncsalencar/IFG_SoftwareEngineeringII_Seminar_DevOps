@@ -1,0 +1,21 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**", "target/release/**"]
+    },
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "lint": {},
+    "format:check": {},
+    "format": {
+      "cache": false
+    },
+    "typecheck": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

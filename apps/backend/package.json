@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cargo build --release",
+    "test": "cargo test",
+    "lint": "cargo clippy --all-targets -- -D warnings",
+    "typecheck": "cargo check --all-targets",
+    "format:check": "cargo fmt --check",
+    "format": "cargo fmt",
+    "dev": "cargo run"
+  }
+}

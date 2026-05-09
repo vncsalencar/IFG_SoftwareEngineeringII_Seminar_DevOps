@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend-format:
+    name: backend / format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - run: nix develop --command pnpm --filter backend format:check
+
+  backend-lint:
+    name: backend / lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/backend
+      - run: nix develop --command pnpm --filter backend lint
+
+  backend-typecheck:
+    name: backend / typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/backend
+      - run: nix develop --command pnpm --filter backend typecheck
+
+  backend-test:
+    name: backend / test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/backend
+      - run: nix develop --command pnpm --filter backend test
+
+  frontend-format:
+    name: frontend / format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - run: nix develop --command pnpm install --frozen-lockfile
+      - run: nix develop --command pnpm --filter frontend format:check
+
+  frontend-lint:
+    name: frontend / lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - run: nix develop --command pnpm install --frozen-lockfile
+      - run: nix develop --command pnpm --filter frontend lint
+
+  frontend-typecheck:
+    name: frontend / typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - run: nix develop --command pnpm install --frozen-lockfile
+      - run: nix develop --command pnpm --filter frontend typecheck
+
+  frontend-test:
+    name: frontend / test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - run: nix develop --command pnpm install --frozen-lockfile
+      - run: nix develop --command pnpm --filter frontend test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: apps/frontend/coverage/

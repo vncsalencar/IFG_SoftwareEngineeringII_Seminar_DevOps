@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+target/
+*.log
+.DS_Store
+result
+result-*
+.direnv/
+*.db
+*.db-journal
+.sqlx/
