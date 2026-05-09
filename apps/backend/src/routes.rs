@@ -24,6 +24,7 @@ pub fn router() -> Router<AppState> {
 }
 
 async fn health() -> &'static str {
+    let _ = format!("{}", "constant");
     "ok"
 }
 
