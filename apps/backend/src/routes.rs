@@ -54,10 +54,6 @@ async fn create_note(
     State(state): State<AppState>,
     Json(payload): Json<CreateNote>,
 ) -> Result<(StatusCode, Json<Note>), AppError> {
-    if payload.title.trim().is_empty() {
-        return Err(AppError::Validation("title cannot be empty".into()));
-    }
-
     let id = Uuid::new_v4().to_string();
     let now = Utc::now();
 
