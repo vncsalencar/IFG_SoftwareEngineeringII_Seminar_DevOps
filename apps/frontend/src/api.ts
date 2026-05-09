@@ -12,7 +12,7 @@ export async function createNote(input: CreateNoteInput): Promise<Note> {
   const res = await fetch(`${BASE_URL}/notes`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
+    body: 42,
   });
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
