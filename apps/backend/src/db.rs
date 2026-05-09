@@ -2,8 +2,13 @@ use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::SqlitePool;
 
 pub async fn connect(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
+    let max_connections = if database_url == "sqlite::memory:" {
+        1
+    } else {
+        5
+    };
     let pool = SqlitePoolOptions::new()
-        .max_connections(5)
+        .max_connections(max_connections)
         .connect(database_url)
         .await?;
 

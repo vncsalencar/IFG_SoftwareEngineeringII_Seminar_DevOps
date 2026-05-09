@@ -16,12 +16,19 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" "rust-analyzer" "clippy" "rustfmt" ];
+          extensions = [ "rust-src" "rust-analyzer" "clippy" "rustfmt" "llvm-tools-preview" ];
         };
+        cargoLlvmCov = pkgs.cargo-llvm-cov.overrideAttrs (old: {
+          doCheck = false;
+          meta = old.meta // {
+            broken = false;
+          };
+        });
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             rustToolchain
+            cargoLlvmCov
             sqlx-cli
             nodejs_20
             nodePackages.pnpm

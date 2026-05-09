@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+coverage.lcov
 .turbo/
 target/
 *.log
@@ -11,3 +12,5 @@ result-*
 *.db
 *.db-journal
 .sqlx/
+playwright-report/
+test-results/

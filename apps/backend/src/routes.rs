@@ -54,7 +54,7 @@ async fn create_note(
     State(state): State<AppState>,
     Json(payload): Json<CreateNote>,
 ) -> Result<(StatusCode, Json<Note>), AppError> {
-    if payload.title.trim().is_empty() {
+    if !crate::validation::is_valid_title(&payload.title) {
         return Err(AppError::Validation("title cannot be empty".into()));
     }
 
@@ -97,7 +97,7 @@ async fn update_note(
     .ok_or(AppError::NotFound)?;
 
     if let Some(title) = payload.title {
-        if title.trim().is_empty() {
+        if !crate::validation::is_valid_title(&title) {
             return Err(AppError::Validation("title cannot be empty".into()));
         }
         note.title = title;
@@ -189,6 +189,163 @@ mod tests {
         let body = json_body(response).await;
         assert_eq!(body["title"], "Hello");
         assert_eq!(body["body"], "World");
+    }
+
+    #[tokio::test]
+    async fn gets_a_note() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/notes")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Hello","body":"World"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let created = json_body(response).await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/api/notes/{}", created["id"].as_str().unwrap()))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        let body = json_body(response).await;
+        assert_eq!(body["title"], "Hello");
+    }
+
+    #[tokio::test]
+    async fn updates_a_note() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/notes")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Old","body":"Body"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let created = json_body(response).await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("PUT")
+                    .uri(format!("/api/notes/{}", created["id"].as_str().unwrap()))
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"New","body":"Updated"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        let body = json_body(response).await;
+        assert_eq!(body["title"], "New");
+        assert_eq!(body["body"], "Updated");
+    }
+
+    #[tokio::test]
+    async fn rejects_empty_update_title() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/notes")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Old","body":"Body"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let created = json_body(response).await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("PUT")
+                    .uri(format!("/api/notes/{}", created["id"].as_str().unwrap()))
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"   "}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 400);
+    }
+
+    #[tokio::test]
+    async fn deletes_a_note() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/notes")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"title":"Delete me","body":"Body"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let created = json_body(response).await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("DELETE")
+                    .uri(format!("/api/notes/{}", created["id"].as_str().unwrap()))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 204);
+    }
+
+    #[tokio::test]
+    async fn returns_404_when_deleting_missing_note() {
+        let pool = connect_test().await;
+        let app = build_app(pool);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("DELETE")
+                    .uri("/api/notes/does-not-exist")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 404);
     }
 
     #[tokio::test]

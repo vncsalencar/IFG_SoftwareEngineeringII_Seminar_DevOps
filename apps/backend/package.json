@@ -5,6 +5,7 @@
   "scripts": {
     "build": "cargo build --release",
     "test": "cargo test",
+    "test:coverage": "cargo llvm-cov --lcov --output-path coverage.lcov --fail-under-lines 75 --ignore-filename-regex 'src/main.rs|rustlib'",
     "lint": "cargo clippy --all-targets -- -D warnings",
     "typecheck": "cargo check --all-targets",
     "format:check": "cargo fmt --check",
