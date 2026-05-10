@@ -73,4 +73,39 @@ describe("App", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("network down");
   });
+
+  it("filters notes by search query", async () => {
+    vi.mocked(listNotes).mockResolvedValueOnce([
+      { id: "1", title: "Apple note", body: "one", created_at: "", updated_at: "" },
+      { id: "2", title: "Banana note", body: "two", created_at: "", updated_at: "" },
+    ]);
+
+    render(<App />);
+
+    await screen.findByText("Apple note");
+
+    await userEvent.type(screen.getByLabelText("search notes"), "Apple");
+
+    expect(screen.getByText("Apple note")).toBeInTheDocument();
+    expect(screen.queryByText("Banana note")).not.toBeInTheDocument();
+  });
+
+  it("shows all notes when search is cleared", async () => {
+    vi.mocked(listNotes).mockResolvedValueOnce([
+      { id: "1", title: "Apple note", body: "one", created_at: "", updated_at: "" },
+      { id: "2", title: "Banana note", body: "two", created_at: "", updated_at: "" },
+    ]);
+
+    render(<App />);
+
+    await screen.findByText("Apple note");
+
+    const searchInput = screen.getByLabelText("search notes");
+    await userEvent.type(searchInput, "Apple");
+    expect(screen.queryByText("Banana note")).not.toBeInTheDocument();
+
+    await userEvent.clear(searchInput);
+    expect(screen.getByText("Apple note")).toBeInTheDocument();
+    expect(screen.getByText("Banana note")).toBeInTheDocument();
+  });
 });

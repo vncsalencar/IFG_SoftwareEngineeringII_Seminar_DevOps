@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { createNote, deleteNote, listNotes } from "./api";
 import { NoteForm } from "./components/NoteForm";
 import { NoteList } from "./components/NoteList";
+import { NoteSearch } from "./components/NoteSearch";
 import type { Note } from "./types";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   async function refresh() {
     try {
@@ -30,12 +32,15 @@ export function App() {
     await refresh();
   }
 
+  const filtered = notes.filter((note) => note.title.toLowerCase().includes(search.toLowerCase()));
+
   return (
     <main>
       <h1>Notes</h1>
       <NoteForm onSubmit={handleCreate} />
       {error && <p role="alert">{error}</p>}
-      <NoteList notes={notes} onDelete={handleDelete} />
+      <NoteSearch value={search} onChange={setSearch} />
+      <NoteList notes={filtered} onDelete={handleDelete} />
     </main>
   );
 }
