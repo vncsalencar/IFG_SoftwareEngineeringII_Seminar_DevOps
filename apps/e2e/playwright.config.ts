@@ -15,7 +15,9 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      command: "cd ../backend && DATABASE_URL=sqlite::memory: cargo run --release",
+      command: process.env.CI
+        ? "cd ../backend && DATABASE_URL=sqlite::memory: ./target/release/notes-backend"
+        : "cd ../backend && DATABASE_URL=sqlite::memory: cargo run --release",
       url: "http://localhost:3000/api/health",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

@@ -141,11 +141,11 @@ jobs:
       - run: nix develop --command pnpm install --frozen-lockfile
       - run: nix develop --command pnpm --filter e2e exec playwright install --with-deps chromium
       - run: nix develop --command pnpm --filter backend build
-      - run: |
-          nix develop --command sh -c '
-            export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/usr/lib/x86_64-linux-gnu:/usr/lib:/lib/x86_64-linux-gnu:/lib"
-            pnpm --filter e2e test
-          '
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g pnpm
+      - run: pnpm --filter e2e test
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
