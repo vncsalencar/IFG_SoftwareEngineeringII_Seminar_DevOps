@@ -1,0 +1,63 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+      backend:
+        target: auto
+        threshold: 1%
+        flags:
+          - backend
+      frontend:
+        target: auto
+        threshold: 1%
+        flags:
+          - frontend
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: backend
+      paths:
+        - apps/backend/
+      carryforward: true
+    - name: frontend
+      paths:
+        - apps/frontend/
+      carryforward: true
+
+component_management:
+  individual_components:
+    - component_id: backend
+      name: Backend
+      paths:
+        - apps/backend/**
+      flag_regexes:
+        - backend
+    - component_id: frontend
+      name: Frontend
+      paths:
+        - apps/frontend/**
+      flag_regexes:
+        - frontend
+
+comment:
+  layout: "header, diff, components, flags, files"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "apps/e2e/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/__tests__/**"
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/target/**"
